@@ -3,55 +3,41 @@
   <head>
     <title> </title>
     <meta charset="utf-8"></meta>
-    <script id="food-template" type="text/x-handlebars-template">
-      <section>
-        <h1> {{name}} </h1>
-        <p> Category: {{category}} </p>
-        <ul> Nutrient List:
-        {{#each nutrients}}
-          <li>
-            {{name}} :   {{quantity}} {{measure}} = {{value}} {{unit}}
-          </li>
-        {{/each}}
-        </ul>
-        <p> portions </br> (1 portion = {{Qty}} {{Unit}})</p>
-      </div>
-      </section>
+    <script id="category-template" type="text/x-handlebars-template">
+        <li class={{id}}> {{name}} portion: {{quantity}} {{unit}} </li>
     </script>
 
-    <script id="recipe-template" type="text/x-handlebars-template">
-      <section class='recipe'>
-        <h2 class={{name}}> {{name}} </h2>
-        <p> Total Calories: {{totalCalories}} </p>
-        <ul> Ingredients:
-        {{#each ingredients}}
-          <li>
-            {{name}} :   {{quantity}} {{unit}} = {{calories}} calories
-          </li>
-        {{/each}}
-        </ul>
-      </div>
-      </section>
+    <script id="nutrient-template" type="text/x-handlebars-template">
+        <li> {{name}} : {{value}} {{unit}} </li>
     </script>
   </head>
 
 
   <body>
-    <p> HELLO TAYLOR </p>
-    <nav>
-      <ul id='mainNav'>
-        <li id='navIngredients' style='color: red; cursor: pointer;'> Ingredients</li>
-        <li id='navRecipes' style='color: blue; cursor: pointer;'>Recipes </li>
-    </nav>
+    <h1> Category </h1>
+
 
     <div id='listOfFoods'>
-      <h1> THIS IS THE LIST OF FOODS </h1>
+        <h3> Fruits </h3>
+        <ul id='fruits' class='foodCategory'> </ul>
+
+        <h3> Nuts </h3>
+        <ul id='nuts' class='foodCategory'> </ul>
+
     </div>
 
-    <div id='listOfRecipes'>
-      <h1> THIS IS THE LIST OF RECIPES </h1>
+    <div>
+        <h1> Smoothie Ingredients </h1>
+        <ul id='ingredients'> </ul>
+
      </div>
 
+     <div>
+       <h1> FINAL NUTRIENT TOTALS </h1>
+       <ul id='nutrients'> </ul>
+     </div>
+
+     <buttion id='startOver' style='color: white; background-color: black;'>Start from scratch </button>
 
     <script   src="https://code.jquery.com/jquery-2.2.3.min.js"   integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="   crossorigin="anonymous"></script>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"> </script>

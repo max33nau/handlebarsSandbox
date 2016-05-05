@@ -1,7 +1,8 @@
 var dummyFoodData = [
   {
+    id: 1,
     name: 'Apple',
-    category: 'fruit',
+    category: 'fruits',
     nutrients: [
       {
         name: 'vitamin C',
@@ -18,137 +19,102 @@ var dummyFoodData = [
         unit: 'kcal'
       }
     ],
-    Qty: '1',
-    Unit: 'whole apple'
+    quantity: '1',
+    unit: 'whole apple'
   },
   {
-    name: 'Milk',
-    category: 'liquid',
+    id: 2,
+    name: 'Peanut',
+    category: 'nuts',
     nutrients: [
       {
-        name: 'calcium',
+        name: 'vitamin C',
+        quantity: '1',
+        measure: 'cup',
+        value: '30',
+        unit: 'kcal'
+      },
+      {
+        name: 'vitamin D',
         quantity: '2',
         measure: 'cups',
         value: '40',
         unit: 'kcal'
-      },
-      {
-        name: 'vitamin D',
-        quantity: '2',
-        measure: 'cups',
-        value: '20',
-        unit: 'kcal'
       }
     ],
-    Qty: '1',
-    Unit: 'cup'
-  },
-  {
-    name: 'Cabbage',
-    category: 'veggie',
-    nutrients: [
-      {
-        name: 'iron',
-        quantity: '1',
-        measure: 'cup',
-        value: '10',
-        unit: 'kcal'
-      },
-      {
-        name: 'vitamin D',
-        quantity: '2',
-        measure: 'cups',
-        value: '20',
-        unit: 'kcal'
-      }
-    ],
-    Qty: '1',
-    Unit: 'whole cabbage'
+    quantity: '10',
+    unit: 'nuts'
   }
 ];
-
-var dummyRecipeData = [
-  {
-    name: 'Apple bananza',
-    ingredients: [
-      {
-        name: 'apple',
-        quantity: '2',
-        unit: 'slices',
-        calories: '200'
-      },
-      {
-        name: 'banana',
-        quantity: '1',
-        unit: 'whole',
-        calories: '200'
-      },
-      {
-        name: 'apple juice',
-        quantity: '20',
-        unit: 'ounces',
-        calories: '200'
-      }
-    ],
-    totalCalories: '600'
-  },
-  {
-    name: 'Green Machine',
-    ingredients: [
-      {
-        name: 'broccoli',
-        quantity: '1',
-        unit: 'lb',
-        calories: '200'
-      },
-      {
-        name: 'brussel sprouts',
-        quantity: '10',
-        unit: 'sprouts',
-        calories: '100'
-      },
-      {
-        name: 'soymilk',
-        quantity: '15',
-        unit: 'ounces',
-        calories: '250'
-      }
-    ],
-    totalCalories: '550'
-  }
-];
-
 
 var $listOfFoods = $('#listOfFoods');
 var $listOfRecipes = $('#listOfRecipes');
-var $foodTemplate = $('#food-template');
-var $recipeTemplate = $('#recipe-template');
+var $foodTemplate = $('#category-template');
+var $nutrientTemplate = $('#nutrient-template');
 var compiledFoodTemplate = Handlebars.compile($foodTemplate.html());
-var compiledRecipeTemplate = Handlebars.compile($recipeTemplate.html());
+var compiledNutrientTemplate = Handlebars.compile($nutrientTemplate.html());
 
 dummyFoodData.forEach(function(foodObject){
-  $listOfFoods.append(
+  $('#'+foodObject.category).append(
     compiledFoodTemplate(foodObject)
   );
 });
 
-dummyRecipeData.forEach(function(recipeObject){
-  $listOfRecipes.append(
-    compiledRecipeTemplate(recipeObject)
+$('.foodCategory').on('click', 'li', function(event){
+  var newListItem = $(this)[0].outerHTML;
+  //console.log(newListItem);
+  $('#ingredients').append(
+    newListItem
   );
+  evaluteFinalNutrients();
 });
 
-$listOfRecipes.hide();
 
-var $listOfRecipes = $('#listOfRecipes');
-var $listOfFoods = $('#listOfFoods');
-$('#mainNav').on('click','li',function(){
-  console.log($(this)[0].id );
-  if($(this)[0].id == 'navRecipes') {
-    $listOfFoods.hide();
-    $listOfRecipes.show();
-  } else if($(this)[0].id =='navIngredients') {
-    $listOfRecipes.hide();
-    $listOfFoods.show();
-  }
+function evaluteFinalNutrients() {
+  $('#nutrients').empty();
+  var listArray = [];
+  var finalNutrientValues = {};
+  var numberOfFoodPortions = {};
+  $('#ingredients li').each(function(){
+    listArray.push(Number($(this)[0].className));
+  });
+  var reducedArray = dummyFoodData.filter(function(object){
+    if(listArray.indexOf(object.id) > -1) {
+      return object;
+    }
+  });
+  listArray.forEach(function(id){
+    if(!numberOfFoodPortions[id]) {
+      numberOfFoodPortions[id] = 1;
+    } else {
+      numberOfFoodPortions[id]++;
+    }
+  });
+  console.log(numberOfFoodPortions);
+  reducedArray.forEach(function(object){
+    object.nutrients.forEach(function(nutrientObject){
+      var newObject = {};
+      if(!finalNutrientValues[nutrientObject.name]) {
+
+        newObject.name = nutrientObject.name;
+        newObject.unit = nutrientObject.unit;
+        var total = Number(nutrientObject.value) * numberOfFoodPortions[object.id];
+        newObject.value = total;
+        finalNutrientValues[nutrientObject.name] = newObject;
+      } else {
+        finalNutrientValues[nutrientObject.name].value +=Number(nutrientObject.value) *numberOfFoodPortions[object.id];
+      }
+    });
+  });
+  console.log(finalNutrientValues);
+  reducedArray[0].nutrients.forEach(function(nutrientObject) {
+    $('#nutrients').append(
+      compiledNutrientTemplate(finalNutrientValues[nutrientObject.name])
+    );
+  });
+}
+
+$('#startOver').on('click', function(){
+  $('#nutrients').empty();
+  $('#ingredients').empty();
 });
