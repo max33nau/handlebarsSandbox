@@ -61,41 +61,48 @@ dummyFoodData.forEach(function(foodObject){
 });
 
 $('.foodCategory').on('click', 'li', function(event){
-  var newListItem = $(this)[0].outerHTML;
-  //console.log(newListItem);
-  $('#ingredients').append(
-    newListItem
-  );
-  evaluteFinalNutrients();
-});
-
-
-function evaluteFinalNutrients() {
-  $('#nutrients').empty();
+  var idName = $(this)[0].className;
+  var foodName = ($(this).find('.foodName').text());
+  var unique = false;
   var listArray = [];
-  var finalNutrientValues = {};
   var numberOfFoodPortions = {};
   $('#ingredients li').each(function(){
     listArray.push(Number($(this)[0].className));
+    var $foodPortions = $(this).find('.numberOfPortions');
+    var numberOfPortions = Number($foodPortions.text());
+    if(idName == $(this)[0].className) {
+      numberOfPortions++;
+      unique = true;
+    }
+    numberOfFoodPortions[Number($(this)[0].className)] = numberOfPortions;
+    $foodPortions.text(numberOfPortions);
   });
+  if(unique == false) {
+    listArray.push(Number($(this)[0].className));
+    var updatedListItem = '<li class='+idName+'> <span class="foodName">'+foodName+'</span> <br>Number Of Portions:<span class="numberOfPortions"> 1 </span> </li>';
+    numberOfFoodPortions[idName] = 1;
+    $('#ingredients').append(
+      updatedListItem
+    );
+  }
+  evaluteFinalNutrients(listArray, numberOfFoodPortions);
+});
+
+
+function evaluteFinalNutrients(listArray,numberOfFoodPortions) {
+  console.log(listArray);
+  console.log(numberOfFoodPortions);
+  $('#nutrients').empty();
+  var finalNutrientValues = {};
   var reducedArray = dummyFoodData.filter(function(object){
     if(listArray.indexOf(object.id) > -1) {
       return object;
     }
   });
-  listArray.forEach(function(id){
-    if(!numberOfFoodPortions[id]) {
-      numberOfFoodPortions[id] = 1;
-    } else {
-      numberOfFoodPortions[id]++;
-    }
-  });
-  console.log(numberOfFoodPortions);
   reducedArray.forEach(function(object){
     object.nutrients.forEach(function(nutrientObject){
       var newObject = {};
       if(!finalNutrientValues[nutrientObject.name]) {
-
         newObject.name = nutrientObject.name;
         newObject.unit = nutrientObject.unit;
         var total = Number(nutrientObject.value) * numberOfFoodPortions[object.id];
